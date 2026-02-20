@@ -1,92 +1,83 @@
 let power = 100;
 let hour = 12;
-let animatronicPos = 0;
-let doors = { left: false, right: false };
-let gameActive = true;
+let animatronicPos = 0; // 0 = far, 3 = attack
+let leftDoor = false;
+let rightDoor = false;
+let camerasOn = false;
+let gameOver = false;
 
-const positions = ["Stage", "Dining Area", "Hallway", "Door"];
-
-const powerEl = document.getElementById("power");
 const timeEl = document.getElementById("time");
-const camText = document.getElementById("animatronicLocation");
-const gameOver = document.getElementById("gameOver");
+const powerEl = document.getElementById("power");
+const messageEl = document.getElementById("message");
+const camScreen = document.getElementById("cameraScreen");
+const animStatus = document.getElementById("animatronicStatus");
 
-document.getElementById("leftDoor").onclick = () => toggleDoor("left");
-document.getElementById("rightDoor").onclick = () => toggleDoor("right");
+document.getElementById("leftDoor").onclick = () => leftDoor = !leftDoor;
+document.getElementById("rightDoor").onclick = () => rightDoor = !rightDoor;
 
-document.getElementById("cameraBtn").onclick = () =>
-  document.getElementById("cameraView").classList.remove("hidden");
+document.getElementById("cameraBtn").onclick = () => {
+  camerasOn = true;
+  camScreen.style.display = "block";
+};
 
-document.getElementById("closeCam").onclick = () =>
-  document.getElementById("cameraView").classList.add("hidden");
+document.getElementById("closeCam").onclick = () => {
+  camerasOn = false;
+  camScreen.style.display = "none";
+};
 
-function toggleDoor(side) {
-  if (!gameActive) return;
-  doors[side] = !doors[side];
+function updateTime() {
+  if (hour === 6) {
+    messageEl.innerText = "6 AM - You Survived!";
+    gameOver = true;
+    return;
+  }
+  hour++;
+  timeEl.innerText = hour + " AM";
 }
 
 function drainPower() {
-  if (!gameActive) return;
+  let drain = 0.2;
+  if (leftDoor) drain += 0.3;
+  if (rightDoor) drain += 0.3;
+  if (camerasOn) drain += 0.5;
 
-  let usage = 1;
-  if (doors.left) usage++;
-  if (doors.right) usage++;
-
-  power -= usage;
-  powerEl.textContent = power;
+  power -= drain;
+  powerEl.innerText = "Power: " + Math.floor(power) + "%";
 
   if (power <= 0) {
-    endGame();
+    gameOver = true;
+    messageEl.innerText = "Power Out... 😱";
   }
 }
 
 function moveAnimatronic() {
-  if (!gameActive) return;
+  if (Math.random() < 0.3) animatronicPos++;
+  animatronicPos = Math.min(animatronicPos, 3);
 
-  // Prevent instant loss at the start
-  if (hour < 1) return;
+  const stages = ["Far", "Hallway", "Door", "ATTACK"];
+  animStatus.innerText = "Animatronic: " + stages[animatronicPos];
 
-  if (Math.random() > 0.7 && animatronicPos < positions.length - 1) {
-    animatronicPos++;
-  }
-
-  camText.textContent = "Animatronic: " + positions[animatronicPos];
-
-  if (positions[animatronicPos] === "Door") {
-    if (!doors.left && !doors.right) {
-      endGame();
+  if (animatronicPos === 3) {
+    if (!leftDoor && !rightDoor) {
+      messageEl.innerText = "JUMPSCARE!";
+      gameOver = true;
     } else {
-      animatronicPos = 0;
+      animatronicPos = 1;
     }
   }
 }
 
-function updateTime() {
-  if (!gameActive) return;
-
-  hour++;
-  timeEl.textContent = hour + " AM";
-
-  if (hour >= 6) {
-    alert("You survived the night!");
-    restartGame();
-  }
-}
-
-function endGame() {
-  gameActive = false;
-  gameOver.classList.remove("hidden");
-  clearInterval(gameLoop);
-  clearInterval(timeLoop);
-}
-
-function restartGame() {
-  location.reload();
-}
-
-const gameLoop = setInterval(() => {
+setInterval(() => {
+  if (gameOver) return;
   drainPower();
-  moveAnimatronic();
-}, 3000);
+}, 1000);
 
-const timeLoop = setInterval(updateTime, 60000);
+setInterval(() => {
+  if (gameOver) return;
+  moveAnimatronic();
+}, 5000);
+
+setInterval(() => {
+  if (gameOver) return;
+  updateTime();
+}, 15000);
