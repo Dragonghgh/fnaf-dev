@@ -1,0 +1,41 @@
+body {
+  background: black;
+  color: white;
+  font-family: monospace;
+  text-align: center;
+}
+
+#game {
+  width: 100vw;
+  height: 100vh;
+}
+
+#hud {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+#office button {
+  margin: 10px;
+  padding: 15px;
+  font-size: 16px;
+}
+
+.hidden {
+  display: none;
+}
+
+#cameraView {
+  background: #111;
+  padding: 20px;
+}
+
+#gameOver {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
