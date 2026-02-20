@@ -18,24 +18,17 @@ body {
 
 #office button {
   margin: 10px;
-  padding: 15px;
-  font-size: 16px;
+  padding: 10px 20px;
 }
 
-.hidden {
+#cameraScreen {
   display: none;
-}
-
-#cameraView {
   background: #111;
   padding: 20px;
+  border: 2px solid white;
 }
 
-#gameOver {
-  position: fixed;
-  inset: 0;
-  background: black;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+#message {
+  font-size: 30px;
+  margin-top: 20px;
 }
